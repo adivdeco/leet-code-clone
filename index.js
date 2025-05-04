@@ -1,7 +1,6 @@
 const express = require('express');
 const main = require('./database');
 require('dotenv').config();
-const User = require('./modules/userSchema');
 const authRoutre = require('./routes/userAuth');
 // const validateuser = require('./utils/validators')
 
