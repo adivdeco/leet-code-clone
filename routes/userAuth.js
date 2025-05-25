@@ -1,25 +1,13 @@
-// const bcrypt = require('bcrypt');
-const validateuser = require('../utils/validators')
 const express = require('express');
-const User = require('../modules/userSchema')
-
+const { register, login, logout, profile } = require ('../controllers/userAuthent.js');
+const userMiddleware = require('../middleware/userMiddleware.js');
 const authRoutre = express.Router()
 
-authRoutre.post('/register', async (req, res) => {
-    
-    try {
-        console.log(req.body);
-        validateuser(req.body);
+authRoutre.post('/register', register)
+authRoutre.post('/login', login );
+authRoutre.post('/logout', userMiddleware, logout);
+// authRoutre.get('/profile', profile);
 
-        // req.body.password = await bcrypt.hash(req.body.password,10);
 
-        await User.create(req.body);
-        res.send("User Created Successfully");
-    }
-    catch (err){
-        res.send("Error: " + err.message)
-    }
-
-})
 
 module.exports = authRoutre;

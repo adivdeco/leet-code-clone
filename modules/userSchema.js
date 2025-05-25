@@ -25,10 +25,22 @@ const userSchema = new Schema({
         type:String,
         required:true,
         minLength:4,
-        maxLength:10,
-    }
-
-})
+        // maxLength:10,
+    },
+    role:{
+        type:String,
+        enum:['user', 'admin'],
+        default:'user',
+    },
+    problemSolved:{
+        type:[String],
+        // default:0,
+    },
+    
+},{
+    timestamps:true,
+    versionKey:false,
+});
 
 const User = mongoose.model('userdata', userSchema);
 module.exports = User;
