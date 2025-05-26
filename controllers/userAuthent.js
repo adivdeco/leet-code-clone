@@ -2,6 +2,7 @@ const User = require('../modules/userSchema')
 const bcrypt = require('bcrypt');
 const validateuser = require('../utils/validators');
 const jwt = require('jsonwebtoken');
+const redisClint = require('../config/redis'); 
 
 const register = async (req, res) => {
      try {
@@ -10,10 +11,12 @@ const register = async (req, res) => {
 
             const { name, email, password } = req.body;
             req.body.password = await bcrypt.hash(password,10);
+            
+            req.body.role = 'user'; 
+            const user = await User.create(req.body);   // add data to database
 
-            const user = await User.create(req.body);
-
-            const token = jwt.sign({email:email,_id:user._id },"secretkey",{expiresIn:60*60}); // 1 hour expiration
+            const token = jwt.sign({email:email,_id:user._id,role:'user' },"secretkey",{expiresIn:60*60}); // 1 hour expiration
+            
             res.cookie('token',token, {maxAge: 60 * 60 * 1000, httpOnly: true}); // Set cookie with token
             res.send("User Created Successfully");
         }
@@ -30,7 +33,7 @@ const login = async (req, res) => {
             return res.status(400).send("Email and password are required");
         }
 
-        const user = await User.findOne({email});
+        const user = await User.findOne({email});   // Find user by email
 
         const match = await bcrypt.compare(password,user.password);
 
@@ -38,7 +41,7 @@ const login = async (req, res) => {
             return res.status(401).send("Invalid email or password");
         }
  
-        const token = jwt.sign({email:email,_id:user._id},"secreatkey",{expiresIn:60*60}); // 1 hour expiration
+        const token = jwt.sign({email:email,_id:user._id, role:user.role},"secreatkey",{expiresIn:60*60}); // 1 hour expiration
             res.cookie('token', token, { maxAge: 60 * 60 * 1000, httpOnly: true }); // Set cookie with token
             res.send("Login Successful");
          
@@ -50,11 +53,41 @@ const login = async (req, res) => {
 
 }
 
-const logout = (req, res) => {
+const logout = async(req, res) => {
 
     try{
         //validate tocken
+        const { token } = req.cookies;
+        const payload = jwt.decode(token);
+        console.log("Payload:", payload);
 
+        await redisClint.set(`blocked:${token}` ,'blocked');
+        await redisClint.expireAt(`blocked:${token}`, payload.exp); // Set expiration same as token expiration
+        // res.clearCookie('token'); // Clear the cookie
+
+        res.cookie('token',null,{expires: new Date(Date.now())}); // Clear the cookie {maxAge:0, httpOnly:true}   
+        res.send("Logout Successful");
+
+    }
+    catch (err) {
+        res.status(500).send("Error: " + err.message);
+    }
+}
+
+const adminregister = async (req, res) => {
+    try{
+       
+        const { name, email, password } = req.body;
+        validateuser(req.body);
+        
+        req.body.password = await bcrypt.hash(password,10);
+        req.body.role = 'admin'; 
+
+        const user = await User.create(req.body);   
+        
+        const token = jwt.sign({email:email,_id:user._id, role:'admin' },"secretkey",{expiresIn:60*60}); // 1 hour expiration
+        res.cookie('token', token, { maxAge: 60 * 60 * 1000, httpOnly: true }); // Set cookie with token
+        res.send("Admin User Created Successfully");
     }
     catch (err) {
         res.status(500).send("Error: " + err.message);
@@ -70,7 +103,8 @@ const logout = (req, res) => {
 module.exports = {
     register,
     login,
-    logout
+    logout,
+    adminregister
 }
 
 

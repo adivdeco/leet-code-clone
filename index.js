@@ -7,6 +7,10 @@ const redisClint = require('./config/redis');
 
 const app = express();
 
+
+
+
+
 app.use(express.json());
 app.use(cookieParser()); // Middleware to parse cookies
 
