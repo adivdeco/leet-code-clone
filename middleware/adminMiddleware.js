@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../modules/userSchema');
+const User = require('../models/userSchema');
 const redisClint = require('../config/redis');
 
 const adminMiddleware = async(req, res, next) => {
