@@ -4,6 +4,8 @@ const validateuser = require('../utils/validators');
 const jwt = require('jsonwebtoken');
 const redisClint = require('../config/redis'); 
 
+
+
 const register = async (req, res) => {
      try {
             console.log(req.body);
@@ -77,15 +79,13 @@ const logout = async(req, res) => {
 const adminregister = async (req, res) => {
     try{
        
-        const { name, email, password } = req.body;
         validateuser(req.body);
-        
+
+        const { email, password } = req.body;
         req.body.password = await bcrypt.hash(password,10);
-        req.body.role = 'admin'; 
 
         const user = await User.create(req.body);   
-        
-        const token = jwt.sign({email:email,_id:user._id, role:'admin' },"secretkey",{expiresIn:60*60}); // 1 hour expiration
+        const token = jwt.sign({email:email,_id:user._id, role:user.role },"secretkey",{expiresIn:60*60}); // 1 hour expiration
         res.cookie('token', token, { maxAge: 60 * 60 * 1000, httpOnly: true }); // Set cookie with token
         res.send("Admin User Created Successfully");
     }

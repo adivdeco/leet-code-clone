@@ -4,6 +4,7 @@ require('dotenv').config();
 const authRoutre = require('./routes/userAuth');
 const cookieParser = require('cookie-parser');
 const redisClint = require('./config/redis');
+const problemRouter = require('./routes/problemCreator');
 
 const app = express();
 
@@ -16,7 +17,7 @@ app.use(cookieParser()); // Middleware to parse cookies
 
 
 app.use('/auth' , authRoutre) // user  login,registration,logout and progile view code
-
+app.use('/problem', problemRouter)
 
 
 
