@@ -81,6 +81,7 @@ async function fetchData() {
   const result =  await fetchData();
 
   const Isresultobtained = result.submissions.every((r)=> r.status_id>2)
+console.log("hlo3");
 
   if(Isresultobtained){
     return result.submissions;
@@ -89,7 +90,9 @@ async function fetchData() {
   await waiting(1000)
 
   }
+
   }
+  
   // this fun gives the result of all test cases as array of objects like [{status:{id:3},time:0.1,memory:1024},{status:{id:3},time:0.1,memory:1024}] and we can check the status_id to know if the test case passed or not
   // status_id 3 means test case passed, 4 means test case failed, 5 means compilation error, 6 means runtime error, 7 means time limit exceeded, 8 means memory limit exceeded
 

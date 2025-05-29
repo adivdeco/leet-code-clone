@@ -9,11 +9,6 @@ const problemSchema = new Schema({
         type: String,
         required: true,
     },
-    difficulty:{
-        type: String,
-        enum: ['easy', 'medium', 'hard'],
-        required: true,
-    },
     description:{
         type: String,
         required: true,
@@ -82,6 +77,16 @@ const problemSchema = new Schema({
         ref:'user',
         required:true
     }
+//    data:[{
+//      code: {
+//         type: String,
+//         required: true,
+//     },
+//     language: {
+//         type: String,
+//         required: true,
+//     }
+// }]
 
 })
 

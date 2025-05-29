@@ -1,10 +1,10 @@
 const { getlanguageById,submitBatch,submitToken } = require('../utils/ProblemsValidtor');
 const Problem = require('../models/problemSchema');
-
+const userMiddleware = require('../middleware/userMiddleware');
 
 const createProblem = async (req, res) => {
 
-    const {title,description,difficulty,tags,visibleTestCases,
+    const {title,description,tags,visibleTestCases,
         hiddenTestCases,startCode,referenceSolution,problemCreator} = req.body;
        
        
@@ -34,24 +34,27 @@ const createProblem = async (req, res) => {
         // console.log("Test Result:", testResult);
         
 
-        for(const test of testResult){
-        if(test.status_id!=3){
-         return res.status(400).send("Error Occured");
-        }
-       }
+    //     for(const test of testResult){
+    //     if(!test.status || test.status.id !== 3){
+    //      return res.status(400).send("Error Occured");
+    //     }
+    //    }
 
      }
+console.log("helo");
 
 //export to db
     const problem = await Problem.create({
-        ...req.body
-        // problemCreator: req.finduser._id, 
+        ...req.body,
+        problemCreator: req.finduser._id, 
     }); 
     res.status(201).send({message: "Problem created successfully",problem});
+    console.log("hlo2");
 
 }
-        catch (err) {
-            new Error("Error in creating problem: " + err.message);
+        catch(err){
+            console.error("Error creating problem:", err);
+            res.status(500).send({message: "Error creating problem", error: err.message});
         }
         
 
